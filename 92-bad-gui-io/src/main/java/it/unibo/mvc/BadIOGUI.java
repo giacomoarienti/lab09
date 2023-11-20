@@ -41,19 +41,19 @@ public class BadIOGUI {
     public BadIOGUI() {
         final JPanel canvas = new JPanel();
         canvas.setLayout(new BorderLayout());
-        final JButton write = new JButton("Write on file");
-        canvas.add(write, BorderLayout.CENTER);
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        final JButton write = new JButton("Write on file");
         /*
          * Handlers
+         *
          */
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 /*
                  * This would be VERY BAD in a real application.
-                 * 
+                 *
                  * This makes the Event Dispatch Thread (EDT) work on an I/O
                  * operation. I/O operations may take a long time, during which
                  * your UI becomes completely unresponsive.
@@ -65,6 +65,36 @@ public class BadIOGUI {
                     e1.printStackTrace(); // NOPMD: allowed as this is just an exercise
                 }
             }
+        });
+        // 1. Create a new JPanel
+        final JPanel newPanel = new JPanel();
+        // 2. Use an horizontal BoxLayout as layout
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.X_AXIS));
+        // Set the new JPanel as the only content of the center of the current
+        // BorderLayout
+        canvas.add(newPanel);
+        // 4. Add the "write" JButton to the new panel
+        newPanel.add(write);
+        // 1. Create a new "Read" button
+        final JButton read = new JButton("Read");
+        newPanel.add(read);
+        // 4. Write a new ``ActionListener`` for the new button, in form of anonymous
+        // class, that prints a string on terminal (use ``System.out``) when the button
+        // is pressed.
+        read.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent arg0) {
+                try {
+                    final List<String> lines = Files.readAllLines(new File(PATH).toPath(), StandardCharsets.UTF_8);
+                    for (final String line : lines) {
+                        System.out.println(line);
+                    }
+                } catch (final IOException e) {
+                    JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace(); // NOPMD: allowed as this is just an exercise
+                }
+            }
+
         });
     }
 
@@ -87,6 +117,9 @@ public class BadIOGUI {
          * on screen. Results may vary, but it is generally the best choice.
          */
         frame.setLocationByPlatform(true);
+        // 6. In ``display()``, use JFrame.pack() to resize the frame to the minimum
+        // size prior to displaying
+        frame.pack();
         /*
          * OK, ready to push the frame onscreen
          */
@@ -99,6 +132,6 @@ public class BadIOGUI {
      * @param args ignored
      */
     public static void main(final String... args) {
-       new BadIOGUI().display();
+        new BadIOGUI().display();
     }
 }
